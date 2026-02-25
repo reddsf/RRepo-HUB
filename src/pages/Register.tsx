@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Github } from 'lucide-react';
 
 export default function Register() {
   const [firstName, setFirstName] = useState('');
@@ -16,7 +16,7 @@ export default function Register() {
   const [captchaAnswer, setCaptchaAnswer] = useState('');
   
   const [error, setError] = useState('');
-  const { register } = useAuth();
+  const { register, loginWithGoogle, loginWithGithub } = useAuth();
   const navigate = useNavigate();
 
   const generateCaptcha = () => {
@@ -40,8 +40,12 @@ export default function Register() {
     }
 
     try {
-      await register(email, password);
-      navigate('/verify-email', { state: { email } });
+      await register(email.trim(), password, { 
+        username: username.trim(), 
+        firstName: firstName.trim(), 
+        lastName: lastName.trim() 
+      });
+      navigate('/verify-email', { state: { email: email.trim() } });
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
@@ -50,6 +54,26 @@ export default function Register() {
         setError('Registration failed: ' + err.message);
       }
       generateCaptcha();
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await loginWithGoogle();
+      navigate('/browse');
+    } catch (err: any) {
+      console.error(err);
+      setError('Google login failed: ' + err.message);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      await loginWithGithub();
+      navigate('/browse');
+    } catch (err: any) {
+      console.error(err);
+      setError('GitHub login failed: ' + err.message);
     }
   };
 
@@ -150,6 +174,15 @@ export default function Register() {
                 <button type="submit" className="retro-button px-8 py-2">Register</button>
             </div>
           </form>
+
+          <div className="mt-6 border-t border-[#333] pt-4 space-y-3">
+             <button onClick={handleGoogleLogin} className="w-full bg-[#333] hover:bg-[#444] text-white py-2 px-4 text-xs font-bold uppercase tracking-wider transition-colors border border-[#444]">
+                Sign in with Google
+             </button>
+             <button onClick={handleGithubLogin} className="w-full bg-[#24292e] hover:bg-[#2f363d] text-white py-2 px-4 text-xs font-bold uppercase tracking-wider transition-colors border border-[#444] flex items-center justify-center gap-2">
+                <Github size={14} /> Sign in with GitHub
+             </button>
+          </div>
         </div>
       </div>
     </div>

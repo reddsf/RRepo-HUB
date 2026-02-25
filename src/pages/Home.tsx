@@ -1,14 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function Home() {
-  const [stats, setStats] = useState({ userCount: 0, fileCount: 0 });
+  const [stats, setStats] = useState({
+    mostDownloaded: null as any,
+    newestFile: null as any,
+    totalDownloads: 0
+  });
 
   useEffect(() => {
-    fetch('/api/stats')
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(err => console.error("Failed to fetch stats", err));
+    const fetchStats = async () => {
+      try {
+        // Fetch all files to calculate total downloads (not efficient for large scale but fine here)
+        // And find max downloaded
+        const q = query(collection(db, "files"));
+        const snapshot = await getDocs(q);
+        
+        let total = 0;
+        let maxDl = -1;
+        let mostDlFile = null;
+        let newest = null;
+        let newestDate = 0;
+
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          total += (data.downloads || 0);
+          
+          if ((data.downloads || 0) > maxDl) {
+            maxDl = data.downloads || 0;
+            mostDlFile = { id: doc.id, ...data };
+          }
+
+          const d = new Date(data.date).getTime();
+          if (d > newestDate) {
+            newestDate = d;
+            newest = { id: doc.id, ...data };
+          }
+        });
+
+        setStats({
+          mostDownloaded: mostDlFile,
+          newestFile: newest,
+          totalDownloads: total
+        });
+
+      } catch (err) {
+        console.error("Failed to fetch stats", err);
+      }
+    };
+    fetchStats();
   }, []);
 
   return (
@@ -43,15 +85,43 @@ export default function Home() {
         <div className="space-y-6">
           <div className="bg-[#1e1e1e] border border-[#333]">
             <div className="bg-[#181818] p-3 border-b border-[#333] font-bold text-[#e0e0e0] text-center uppercase tracking-wider text-xs">
-              Repository Stats
+              Repository Highlights
             </div>
-            <div className="p-4 text-xs space-y-2">
-              <div className="flex justify-between border-b border-[#2a2a2a] pb-1"><span className="text-[#777]">Registered Users:</span> <span className="text-[#ccc]">{stats.userCount}</span></div>
-              <div className="flex justify-between border-b border-[#2a2a2a] pb-1"><span className="text-[#777]">Files Hosted:</span> <span className="text-[#ccc]">{stats.fileCount}</span></div>
-              <div className="flex justify-between pt-1"><span className="text-[#777]">Newest Member:</span> <Link to="#" className="text-[#64b5f6]">Hidden</Link></div>
+            <div className="p-4 text-xs space-y-3">
+              <div className="border-b border-[#2a2a2a] pb-2">
+                <div className="text-[#777] mb-1">Most Popular File:</div>
+                {stats.mostDownloaded ? (
+                  <Link to={`/details/${stats.mostDownloaded.id}`} className="text-[#64b5f6] font-bold hover:underline block truncate">
+                    {stats.mostDownloaded.name} ({stats.mostDownloaded.downloads} DLs)
+                  </Link>
+                ) : <span className="text-[#444]">None</span>}
+              </div>
+              
+              <div className="border-b border-[#2a2a2a] pb-2">
+                <div className="text-[#777] mb-1">Newest Drop:</div>
+                {stats.newestFile ? (
+                  <Link to={`/details/${stats.newestFile.id}`} className="text-[#64b5f6] font-bold hover:underline block truncate">
+                    {stats.newestFile.name}
+                  </Link>
+                ) : <span className="text-[#444]">None</span>}
+              </div>
+
+              <div className="pt-1">
+                <div className="text-[#777] mb-1">Total Downloads Served:</div>
+                <div className="text-[#ccc] font-mono text-lg">{stats.totalDownloads}</div>
+              </div>
             </div>
           </div>
           
+          <div className="bg-[#1e1e1e] border border-[#333]">
+            <div className="bg-[#181818] p-3 border-b border-[#333] font-bold text-[#e0e0e0] text-center uppercase tracking-wider text-xs">
+              Find Users
+            </div>
+            <div className="p-4 text-center">
+               <Link to="/users" className="retro-button w-full block text-xs">Search User Database</Link>
+            </div>
+          </div>
+
           <div className="bg-[#1e1e1e] border border-[#333]">
             <div className="bg-[#181818] p-3 border-b border-[#333] font-bold text-[#e0e0e0] text-center uppercase tracking-wider text-xs">
               Disclaimer

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { Github } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, loginWithGithub } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +32,16 @@ export default function Login() {
     } catch (err: any) {
       console.error(err);
       setError('Google login failed: ' + err.message);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      await loginWithGithub();
+      navigate('/browse');
+    } catch (err: any) {
+      console.error(err);
+      setError('GitHub login failed: ' + err.message);
     }
   };
 
@@ -69,7 +80,7 @@ export default function Login() {
             </div>
           </form>
 
-          <div className="mt-6 border-t border-[#333] pt-4">
+          <div className="mt-6 border-t border-[#333] pt-4 space-y-3">
             <button 
               onClick={handleGoogleLogin}
               type="button"
@@ -82,6 +93,15 @@ export default function Login() {
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
               Sign in with Google
+            </button>
+            
+            <button 
+              onClick={handleGithubLogin}
+              type="button"
+              className="w-full bg-[#24292e] text-white font-bold py-2 px-4 flex items-center justify-center gap-2 hover:bg-[#2f363d] transition-colors rounded-none text-xs"
+            >
+              <Github size={16} />
+              Sign in with GitHub
             </button>
           </div>
         </div>

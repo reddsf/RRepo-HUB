@@ -63,6 +63,7 @@ export default function Upload() {
         size: fileSize,
         description,
         uploader: user?.email?.split('@')[0] || 'Anonymous',
+        uploaderUid: user?.uid, // Add this line
         downloadUrl,
         isExternalLink: uploadType === 'link',
         date: new Date().toISOString(),

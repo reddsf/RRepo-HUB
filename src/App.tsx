@@ -19,6 +19,10 @@ import Terms from './pages/Terms';
 
 import VerifyEmail from './pages/VerifyEmail';
 
+import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
+import UserSearch from './pages/UserSearch';
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -70,6 +74,30 @@ export default function App() {
             <ProtectedRoute>
               <Layout>
                 <Terms />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Layout>
+                <Profile />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/user/:uid" element={
+            <ProtectedRoute>
+              <Layout>
+                <UserProfile />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/users" element={
+            <ProtectedRoute>
+              <Layout>
+                <UserSearch />
               </Layout>
             </ProtectedRoute>
           } />

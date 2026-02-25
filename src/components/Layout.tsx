@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { LogOut, Upload, Search, Home, User as UserIcon, Settings, MessageSquare, ShieldAlert } from 'lucide-react';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth();
+  const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {user && (
         <div className="bg-[#1e1e1e] text-[#aaa] px-6 py-2 text-xs flex justify-between items-center border-b border-[#333]">
           <div className="flex gap-4">
-            <span>Welcome, <span className="font-bold text-[#64b5f6]">{user.email?.split('@')[0] || 'User'}</span></span>
+            <span>Welcome, <span className="font-bold text-[#64b5f6]">{userProfile?.username || user.displayName || user.email?.split('@')[0] || 'User'}</span></span>
             <span className="text-[#666]">|</span>
             <span>Role: <span className="text-[#e0e0e0]">User</span></span>
           </div>
