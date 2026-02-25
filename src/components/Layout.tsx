@@ -54,6 +54,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <li><Link to="/" className="block px-6 py-3 hover:bg-[#252525] hover:text-white transition-colors">Home</Link></li>
           <li><Link to="/browse" className="block px-6 py-3 hover:bg-[#252525] hover:text-white transition-colors">Browse</Link></li>
           <li><Link to="/upload" className="block px-6 py-3 hover:bg-[#252525] hover:text-white transition-colors">Upload</Link></li>
+          <li><Link to="/users" className="block px-6 py-3 hover:bg-[#252525] hover:text-white transition-colors">Find Users</Link></li>
           <li><Link to="/terms" className="block px-6 py-3 hover:bg-[#252525] hover:text-white transition-colors">Terms & Rules</Link></li>
         </ul>
       </nav>

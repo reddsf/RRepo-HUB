@@ -6,7 +6,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebase';
 
 export default function Upload() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [category, setCategory] = useState('Movies');
@@ -62,8 +62,8 @@ export default function Upload() {
         type,
         size: fileSize,
         description,
-        uploader: user?.email?.split('@')[0] || 'Anonymous',
-        uploaderUid: user?.uid, // Add this line
+        uploader: userProfile?.username || user?.displayName || user?.email?.split('@')[0] || 'Anonymous',
+        uploaderUid: user?.uid, 
         downloadUrl,
         isExternalLink: uploadType === 'link',
         date: new Date().toISOString(),
