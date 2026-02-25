@@ -32,12 +32,16 @@ export default function Upload() {
           throw new Error('Please select a file');
         }
         
+        // Enforce 1MB limit
+        if (file.size > 1048576) {
+          throw new Error('File size exceeds 1MB limit. Please use "External Link" for larger files.');
+        }
+        
         // Calculate size string
         const bytes = file.size;
         if (bytes < 1024) fileSize = bytes + ' B';
         else if (bytes < 1048576) fileSize = (bytes / 1024).toFixed(1) + ' KB';
-        else if (bytes < 1073741824) fileSize = (bytes / 1048576).toFixed(1) + ' MB';
-        else fileSize = (bytes / 1073741824).toFixed(1) + ' GB';
+        else fileSize = (bytes / 1048576).toFixed(1) + ' MB';
 
         // Upload to Firebase Storage
         const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
@@ -80,9 +84,13 @@ export default function Upload() {
           Upload Content
        </div>
        <div className="bg-[#181818] border border-[#333] p-8">
-          <div className="bg-blue-900/20 border border-blue-800/30 p-4 mb-8 text-blue-200 text-xs leading-relaxed">
-             <strong>Terms:</strong> By uploading, you certify that you have the right to distribute this content. 
-             Piracy is strictly prohibited. RRepoHUB is not responsible for user-uploaded content.
+          <div className="bg-yellow-900/20 border border-yellow-800/30 p-4 mb-8 text-yellow-200 text-xs leading-relaxed">
+             <strong>Storage Policy:</strong> 
+             <ul className="list-disc ml-4 mt-2 space-y-1">
+               <li>Direct file uploads are limited to <strong>1MB</strong> (e.g., .txt, small images, torrent files).</li>
+               <li>For larger files (Games, Movies, Music), please upload to a third-party host (Mega, Google Drive, etc.) and use the <strong>External Link</strong> option.</li>
+               <li>We recommend using <strong>External Links</strong> for almost everything to save space.</li>
+             </ul>
           </div>
 
           {error && <div className="bg-red-900/20 border border-red-800/50 text-red-200 p-3 mb-6 text-center text-xs">{error}</div>}
@@ -97,7 +105,7 @@ export default function Upload() {
                         name="uploadType" 
                         checked={uploadType === 'file'} 
                         onChange={() => setUploadType('file')}
-                      /> File Upload
+                      /> File Upload (Max 1MB)
                    </label>
                    <label className="flex items-center gap-2 cursor-pointer text-[#ccc] text-xs">
                       <input 
@@ -105,7 +113,7 @@ export default function Upload() {
                         name="uploadType" 
                         checked={uploadType === 'link'} 
                         onChange={() => setUploadType('link')}
-                      /> External Link
+                      /> External Link (Unlimited)
                    </label>
                 </div>
              </div>
@@ -119,7 +127,7 @@ export default function Upload() {
                       value={name}
                       onChange={e => setName(e.target.value)}
                       required
-                      placeholder="e.g. Project Backup 2026"
+                      placeholder="e.g. Project Documentation"
                    />
                 </div>
              </div>
@@ -132,13 +140,13 @@ export default function Upload() {
                       value={category}
                       onChange={e => setCategory(e.target.value)}
                    >
-                      <option>Movies</option>
-                      <option>Music</option>
-                      <option>Games</option>
-                      <option>Apps</option>
                       <option>Docs</option>
                       <option>Images</option>
                       <option>Archives</option>
+                      <option>Apps</option>
+                      <option>Movies</option>
+                      <option>Music</option>
+                      <option>Games</option>
                    </select>
                 </div>
              </div>
@@ -151,15 +159,13 @@ export default function Upload() {
                       value={type}
                       onChange={e => setType(e.target.value)}
                    >
+                      <option value="txt">Text File</option>
+                      <option value="pdf">PDF Document</option>
+                      <option value="jpg">JPG Image</option>
+                      <option value="png">PNG Image</option>
                       <option value="zip">ZIP Archive</option>
                       <option value="7z">7-Zip Archive</option>
                       <option value="rar">RAR Archive</option>
-                      <option value="mp4">MP4 Video</option>
-                      <option value="mp3">MP3 Audio</option>
-                      <option value="png">PNG Image</option>
-                      <option value="jpg">JPG Image</option>
-                      <option value="txt">Text File</option>
-                      <option value="pdf">PDF Document</option>
                    </select>
                 </div>
              </div>
